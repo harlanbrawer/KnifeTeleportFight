@@ -21,6 +21,11 @@ public:
 	void Grab();
 	void Release();
 
+	class UGrabComponent* GetGrabComponentNearMotionController();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
+	TArray<TEnumAsByte<EObjectTypeQuery>> GrabbableObjectTypes;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -36,4 +41,11 @@ private:
 
 	// References
 	AHandControllerBase* OtherController;
+
+	// Config
+	UPROPERTY(EditAnywhere)
+	float GrabRadius = 10;
+
+	// State
+	UGrabComponent* HeldComponent;
 };

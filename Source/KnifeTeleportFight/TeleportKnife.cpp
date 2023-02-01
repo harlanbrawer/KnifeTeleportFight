@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Components/BoxComponent.h"
+#include "GrabComponent.h"
 
 // Sets default values
 ATeleportKnife::ATeleportKnife()
@@ -16,33 +17,27 @@ ATeleportKnife::ATeleportKnife()
 
 	DamageCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Damage Collider"));
 	SetRootComponent(DamageCollider);
+	DamageCollider->SetSimulatePhysics(true);
 
-	ProjectileDamageMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Damage Mesh"));
-	ProjectileDamageMesh->SetupAttachment(ProjectileMeshContainer);
-
-
-	//ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
-	//ProjectileMovementComponent->MaxSpeed = 1300.f;
-	//ProjectileMovementComponent->InitialSpeed = 0;
-	//ProjectileMovementComponent->bRotationFollowsVelocity = false;
+	GrabComponent = CreateDefaultSubobject<UGrabComponent>(TEXT("Grab Component"));
+	GrabComponent->SetupAttachment(DamageCollider);
 
 	TrailParticles = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Smoke Trail"));
-	TrailParticles->SetupAttachment(RootComponent);
+	TrailParticles->SetupAttachment(DamageCollider);
 }
 
 void ATeleportKnife::Throw(FVector Velocity)
 {
-	//ProjectileMovementComponent->AddForce(Velocity);
-
-	// Potentially want to interpolate a bit before hard setting this.
-	//ProjectileMovementComponent->bRotationFollowsVelocity = true;
+	DamageCollider->SetSimulatePhysics(true);
 }
 
-void ATeleportKnife::Recall(FVector Location)
+void ATeleportKnife::Recall(FVector SpawnLocation, FRotator SpawnRotation)
 {
-	//ProjectileMovementComponent->bRotationFollowsVelocity = false;
-	//ProjectileMovementComponent->SetVelocityInLocalSpace(FVector::ZeroVector);
-	SetActorLocation(Location);
+	if (GrabComponent->IsHeld()) return;
+
+	DamageCollider->SetSimulatePhysics(false);
+	SetActorRotation(SpawnRotation);
+	SetActorLocation(SpawnLocation);
 }
 
 // Called when the game starts or when spawned
@@ -50,7 +45,7 @@ void ATeleportKnife::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	ProjectileDamageMesh->OnComponentHit.AddDynamic(this, &ATeleportKnife::OnHit);
+	DamageCollider->OnComponentHit.AddDynamic(this, &ATeleportKnife::OnHit);
 }
 
 // Called every frame

@@ -94,8 +94,9 @@ private:
 
 	// Constants
 	UPROPERTY(EditAnywhere)
-	float KnifeSpawnDistance = 100;
+	float KnifeSpawnDistance = 30;
 
 	// Utility
 	FVector GetKnifeSpawnLocation();
+	FRotator GetKnifeSpawnRotation();
 };

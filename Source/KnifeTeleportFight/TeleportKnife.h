@@ -16,7 +16,7 @@ public:
 	ATeleportKnife();
 
 	void Throw(FVector Velocity);
-	void Recall(FVector Location);
+	void Recall(FVector SpawnLocation, FRotator SpawnRotation);
 
 protected:
 	// Called when the game starts or when spawned
@@ -28,28 +28,22 @@ public:
 
 private:
 	// Components
-	UPROPERTY(EditDefaultsOnly, Category = "Combat")
-	USceneComponent* ProjectileMeshContainer;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Combat")
-	UStaticMeshComponent* ProjectileDamageMesh;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Combat")
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
 	class UBoxComponent* DamageCollider;
 
-	//UPROPERTY(VisibleAnywhere, Category = "Combat")
-	//class UProjectileMovementComponent* ProjectileMovementComponent;
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
+	class UGrabComponent* GrabComponent;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Effects")
 	class UParticleSystem* HitParticles;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Effects")
 	class UParticleSystemComponent* TrailParticles;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Effects")
 	class USoundBase* LaunchSound;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Effects")
 	class USoundBase* HitSound;
 
 	// Utility

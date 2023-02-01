@@ -4,6 +4,8 @@
 #include "HandControllerBase.h"
 
 #include "MotionControllerComponent.h"
+#include "GrabComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 AHandControllerBase::AHandControllerBase()
@@ -28,10 +30,60 @@ void AHandControllerBase::PairController(AHandControllerBase* Controller)
 
 void AHandControllerBase::Grab()
 {
+	UGrabComponent* ComponentToGrab = GetGrabComponentNearMotionController();
+	if (!ComponentToGrab) return;
+	UE_LOG(LogTemp, Warning, TEXT("Got component"));
+
+	bool bGrabSuccessful = ComponentToGrab->TryGrab(MotionController);
+	if (!bGrabSuccessful) return;
+
+	HeldComponent = ComponentToGrab;
+
+	// If component is held by other hand, clear reference to it
+	if (OtherController->HeldComponent == HeldComponent)
+	{
+		OtherController->HeldComponent = nullptr;
+	}
 }
 
 void AHandControllerBase::Release()
 {
+	if (!HeldComponent) return;
+
+	bool bReleaseSuccessful = HeldComponent->TryRelease(MotionController);
+	if (!bReleaseSuccessful) return;
+
+	HeldComponent = nullptr;
+
+}
+
+UGrabComponent* AHandControllerBase::GetGrabComponentNearMotionController()
+{
+	FVector HandLocation = GetActorLocation();
+	
+	TArray<FHitResult> OutHits;
+	bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), HandLocation, HandLocation, GrabRadius, GrabbableObjectTypes, false, {}, EDrawDebugTrace::Persistent, OutHits, true);
+	if (!bHit) return nullptr;
+	if (!OutHits.Num()) return nullptr; // Not sure if this is necessary since bHit should be false I think
+
+	UGrabComponent* ClosestGrabComponentInRange = nullptr;
+	float DistanceToClosestGrabbableComponentInRange = GrabRadius + 10000; // Arbitary bigger than GrabRadius
+	for (int i = 0; i < OutHits.Num(); i++)
+	{
+		AActor* HitActor = OutHits[i].GetActor();
+		TArray<UActorComponent*> GrabComponentsOnActor = HitActor->GetComponentsByClass(UGrabComponent::StaticClass());
+		for (int j = 0; j < GrabComponentsOnActor.Num(); j++)
+		{
+			UGrabComponent* HitComponent = Cast<UGrabComponent>(GrabComponentsOnActor[j]);
+			float DistanceToComponent = (HitComponent->GetComponentLocation() - HandLocation).Length();
+			if (DistanceToComponent < DistanceToClosestGrabbableComponentInRange) {
+				ClosestGrabComponentInRange = HitComponent;
+				DistanceToClosestGrabbableComponentInRange = DistanceToComponent;
+			}
+		}
+	}
+
+	return ClosestGrabComponentInRange;
 }
 
 // Called when the game starts or when spawned

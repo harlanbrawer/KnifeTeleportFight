@@ -10,7 +10,7 @@
 #include "Components/PostProcessComponent.h"
 #include "InputMappingContext.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
-
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AVRCharacter::AVRCharacter()
@@ -145,7 +145,7 @@ void AVRCharacter::MoveRight(const FInputActionValue& Value)
 
 void AVRCharacter::RecallWeapon()
 {
-	TeleportKnife->Recall(GetKnifeSpawnLocation());
+	TeleportKnife->Recall(GetKnifeSpawnLocation(), GetKnifeSpawnRotation());
 }
 
 void AVRCharacter::Teleport()
@@ -154,6 +154,12 @@ void AVRCharacter::Teleport()
 
 FVector AVRCharacter::GetKnifeSpawnLocation()
 {
-	return GetActorLocation() + GetActorForwardVector() * KnifeSpawnDistance;
+	FVector Offset = Camera->GetForwardVector() * KnifeSpawnDistance;
+	return Camera->GetComponentLocation() + Offset;
+}
+
+FRotator AVRCharacter::GetKnifeSpawnRotation()
+{
+	return UKismetMathLibrary::MakeRotationFromAxes(Camera->GetUpVector(), -Camera->GetForwardVector(), -Camera->GetRightVector());
 }
 
