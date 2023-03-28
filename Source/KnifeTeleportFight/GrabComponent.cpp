@@ -6,6 +6,7 @@
 #include "Components/PrimitiveComponent.h"
 #include "MotionControllerComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/ArrowComponent.h"
 
 // Sets default values for this component's properties
 UGrabComponent::UGrabComponent()
@@ -30,17 +31,22 @@ bool UGrabComponent::TryGrab(UMotionControllerComponent* GrabbingMotionControlle
 	
 	// Attach parent component to the motion controller component
 	USceneComponent* UMotionControllerSceneComponent = Cast<USceneComponent>(GrabbingMotionControllerComponent);
-	ParentComponent->AttachToComponent(UMotionControllerSceneComponent, FAttachmentTransformRules::KeepWorldTransform);
+	GetOwner()->AttachToActor(UMotionControllerSceneComponent->GetOwner(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
-	bIsHeld = true;
+	bIsHeld = true; 
 
-	// Set new rotation
-	ParentComponent->SetRelativeRotation(GetRelativeRotation().GetInverse(), false, nullptr, ETeleportType::ResetPhysics);
+	// Set rotation to be up in the hand
+	UArrowComponent* UpDirectionComponent = Cast<UArrowComponent>(GrabbingMotionControllerComponent->GetOwner()->GetComponentByClass(UArrowComponent::StaticClass()));
+	if (UpDirectionComponent)
+	{
+		GetOwner()->SetActorRotation(UpDirectionComponent->GetComponentRotation());
+		//GetOwner()->AddActorLocalRotation(FRotator(-90, 0, 0));
+	}
 
 	// Set new location
-	FVector LocalComponentInverseOffset = ParentComponent->GetComponentLocation() - GetComponentLocation();
-	FVector NewParentComponentLocation = GrabbingMotionControllerComponent->GetComponentLocation() + LocalComponentInverseOffset;
-	ParentComponent->SetWorldLocation(NewParentComponentLocation, false, nullptr, ETeleportType::ResetPhysics);
+	FVector GrabComponentInverseOffset = GetOwner()->GetActorLocation() - GetComponentLocation();
+	FVector NewParentComponentLocation = GrabbingMotionControllerComponent->GetOwner()->GetActorLocation() + GrabComponentInverseOffset;
+	GetOwner()->SetActorLocation(NewParentComponentLocation, false, nullptr, ETeleportType::ResetPhysics);
 
 	// Store ref to controller holding this object
 	HoldingControllerComponentRef = GrabbingMotionControllerComponent;

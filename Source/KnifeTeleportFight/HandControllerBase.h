@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include "GrabComponent.h"
+
+#include "Engine/EngineTypes.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "HandControllerBase.generated.h"
@@ -19,12 +23,11 @@ public:
 	void PairController(AHandControllerBase* Controller);
 
 	void Grab();
+	void ForceGrab(UGrabComponent* ComponentToGrab);
 	void Release();
 
 	class UGrabComponent* GetGrabComponentNearMotionController();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
-	TArray<TEnumAsByte<EObjectTypeQuery>> GrabbableObjectTypes;
 
 protected:
 	// Called when the game starts or when spawned
@@ -39,12 +42,17 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UMotionControllerComponent* MotionController;
 
+	UPROPERTY(VisibleAnywhere)
+	class UArrowComponent* HeldUpDirection;
+
 	// References
 	AHandControllerBase* OtherController;
 
 	// Config
 	UPROPERTY(EditAnywhere)
 	float GrabRadius = 10;
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> GrabbableObjectTypes = { UEngineTypes::ConvertToObjectType(UGrabComponent::GrabComponentCollisionChannel) };
 
 	// State
 	UGrabComponent* HeldComponent;

@@ -5,6 +5,7 @@
 #include "InputActionValue.h"
 #include "HandControllerBase.h"
 #include "TeleportKnife.h"
+#include "EnhancedInputComponent.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
@@ -83,6 +84,15 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* TeleportAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* TeleGrabRightAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* TeleGrabLeftAction;
+
+	FEnhancedInputActionValueBinding TeleGrabRightActionValue;
+	FEnhancedInputActionValueBinding TeleGrabLeftActionValue;
+
 	void GrabLeft();
 	void ReleaseLeft();
 	void GrabRight();
@@ -91,10 +101,15 @@ private:
 	void MoveRight(const FInputActionValue& Value);
 	void RecallWeapon();
 	void Teleport();
+	void TeleGrabRight();
+	void TeleGrabLeft();
 
 	// Constants
 	UPROPERTY(EditAnywhere)
 	float KnifeSpawnDistance = 30;
+
+	UPROPERTY(EditAnywhere)
+	float UserEyeHeightCM = 150;
 
 	// Utility
 	FVector GetKnifeSpawnLocation();

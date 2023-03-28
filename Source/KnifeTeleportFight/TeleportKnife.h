@@ -15,8 +15,8 @@ public:
 	// Sets default values for this actor's properties
 	ATeleportKnife();
 
-	void Throw(FVector Velocity);
 	void Recall(FVector SpawnLocation, FRotator SpawnRotation);
+	class UGrabComponent* GetGrabComponent();
 
 protected:
 	// Called when the game starts or when spawned
@@ -34,6 +34,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
 	class UGrabComponent* GrabComponent;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
+	class UCapsuleComponent* GrabCollider;
+
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	class UParticleSystem* HitParticles;
 
@@ -46,13 +49,15 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	class USoundBase* HitSound;
 
+	// Config
+
 	// Utility
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpluse, const FHitResult& HitResult);
 
 	// Constants
 	UPROPERTY(EditAnywhere)
-	float Damage = 50.f;
+	float Damage = 100.f;
 
 	// State
 	FVector ThrowDirection;

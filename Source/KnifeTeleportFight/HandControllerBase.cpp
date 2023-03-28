@@ -4,8 +4,8 @@
 #include "HandControllerBase.h"
 
 #include "MotionControllerComponent.h"
-#include "GrabComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Components/ArrowComponent.h"
 
 // Sets default values
 AHandControllerBase::AHandControllerBase()
@@ -16,6 +16,9 @@ AHandControllerBase::AHandControllerBase()
 	MotionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController"));
 	SetRootComponent(MotionController);
 	MotionController->SetShowDeviceModel(true);
+
+	HeldUpDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("HeldUpDirection"));
+	HeldUpDirection->SetupAttachment(MotionController);
 }
 
 void AHandControllerBase::SetHand(EControllerHand Hand)
@@ -33,6 +36,22 @@ void AHandControllerBase::Grab()
 	UGrabComponent* ComponentToGrab = GetGrabComponentNearMotionController();
 	if (!ComponentToGrab) return;
 	UE_LOG(LogTemp, Warning, TEXT("Got component"));
+
+	bool bGrabSuccessful = ComponentToGrab->TryGrab(MotionController);
+	if (!bGrabSuccessful) return;
+
+	HeldComponent = ComponentToGrab;
+
+	// If component is held by other hand, clear reference to it
+	if (OtherController->HeldComponent == HeldComponent)
+	{
+		OtherController->HeldComponent = nullptr;
+	}
+}
+
+void AHandControllerBase::ForceGrab(UGrabComponent* ComponentToGrab)
+{
+	Release();
 
 	bool bGrabSuccessful = ComponentToGrab->TryGrab(MotionController);
 	if (!bGrabSuccessful) return;

@@ -24,6 +24,8 @@ public:
 
 	bool IsHeld() { return bIsHeld; }
 
+	static const ECollisionChannel GrabComponentCollisionChannel = ECollisionChannel::ECC_GameTraceChannel2;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

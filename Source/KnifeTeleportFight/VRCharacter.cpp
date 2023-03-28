@@ -11,6 +11,7 @@
 #include "InputMappingContext.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "CustomUtils.h"
 
 // Sets default values
 AVRCharacter::AVRCharacter()
@@ -61,8 +62,8 @@ void AVRCharacter::BeginPlay()
 	if (TeleportKnifeClass)
 	{
 		TeleportKnife = GetWorld()->SpawnActor<ATeleportKnife>(TeleportKnifeClass);
-		TeleportKnife->SetActorLocation(GetKnifeSpawnLocation());
 		TeleportKnife->SetOwner(this);
+		RecallWeapon();
 	}
 
 	// Input
@@ -90,6 +91,8 @@ void AVRCharacter::Tick(float DeltaTime)
 	NewCameraOffset.Z = 0;
 	AddActorWorldOffset(NewCameraOffset);
 	VRRoot->AddWorldOffset(-NewCameraOffset);
+
+	UE_LOG(LogTemp, Warning, TEXT("action value: %f"), TeleGrabRightActionValue.GetValue().GetMagnitude());
 }
 
 // Called to bind functionality to input
@@ -107,6 +110,12 @@ void AVRCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &AVRCharacter::MoveRight);
 	Input->BindAction(RecallWeaponAction, ETriggerEvent::Started, this, &AVRCharacter::RecallWeapon);
 	Input->BindAction(TeleportAction, ETriggerEvent::Started, this, &AVRCharacter::Teleport);
+	
+	// Bind to world slowdown and teleport action.
+	Input->BindAction(TeleGrabRightAction, ETriggerEvent::Started, this, &AVRCharacter::TeleGrabRight);
+	Input->BindAction(TeleGrabLeftAction, ETriggerEvent::Started, this, &AVRCharacter::TeleGrabLeft);
+	TeleGrabRightActionValue = Input->BindActionValue(TeleGrabRightAction);
+	TeleGrabLeftActionValue = Input->BindActionValue(TeleGrabLeftAction);
 }
 
 void AVRCharacter::GrabLeft()
@@ -121,7 +130,14 @@ void AVRCharacter::ReleaseLeft()
 
 void AVRCharacter::GrabRight()
 {
-	RightHandController->Grab();
+	if (TeleGrabRightActionValue.GetValue().Get<bool>())
+	{
+		TeleGrabRight();
+	}
+	else
+	{
+		RightHandController->Grab();
+	}
 }
 
 void AVRCharacter::ReleaseRight()
@@ -150,6 +166,51 @@ void AVRCharacter::RecallWeapon()
 
 void AVRCharacter::Teleport()
 {
+}
+
+void AVRCharacter::TeleGrabRight()
+{
+	// Get knife location
+	FVector KnifeLocation = TeleportKnife->GetActorLocation();
+
+	// Determine character teleport location
+		// if knife too low then set knife pos up
+	// Get current character height
+	FVector CameraToHand = RightHandController->GetActorLocation() - Camera->GetComponentLocation();
+	FVector CameraTeleportLocation = KnifeLocation - CameraToHand;
+	
+	FVector ActorToCamera = Camera->GetComponentLocation() - GetActorLocation();
+	FVector ActorToHand = RightHandController->GetActorLocation() - GetActorLocation();
+
+	// if Camera teleport location is too low such that the character is in the ground, then move the character and knife up
+	float PreTeleportCameraDistanceToGround = CustomUtils::DistanceToGround(Camera->GetComponentLocation(), GetWorld());
+	float CameraTeleportLocationDistanceToGround = CustomUtils::DistanceToGround(CameraTeleportLocation, GetWorld());
+	if (CameraTeleportLocationDistanceToGround < UserEyeHeightCM)
+	{
+		// Adjust teleport and knife location
+		//CameraTeleportLocation.Z = UserEyeHeightCM;
+		//CameraTeleportLocationDistanceToGround = UserEyeHeightCM;
+
+
+	}
+
+	FVector ActorTeleportLocation = KnifeLocation - ActorToHand;
+	SetActorLocation(ActorTeleportLocation);
+	RightHandController->ForceGrab(TeleportKnife->GetGrabComponent());
+
+
+	
+
+
+	// Check for anything blocking teleporting
+	// Teleport Character
+	// Grab knife
+
+}
+
+void AVRCharacter::TeleGrabLeft()
+{
+
 }
 
 FVector AVRCharacter::GetKnifeSpawnLocation()
