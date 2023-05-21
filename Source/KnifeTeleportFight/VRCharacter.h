@@ -85,13 +85,10 @@ private:
 	class UInputAction* TeleportAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* TeleGrabRightAction;
+	class UInputAction* PrepTeleGrabRightAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* TeleGrabLeftAction;
-
-	FEnhancedInputActionValueBinding TeleGrabRightActionValue;
-	FEnhancedInputActionValueBinding TeleGrabLeftActionValue;
+	class UInputAction* PrepTeleGrabLeftAction;
 
 	void GrabLeft();
 	void ReleaseLeft();
@@ -101,8 +98,12 @@ private:
 	void MoveRight(const FInputActionValue& Value);
 	void RecallWeapon();
 	void Teleport();
-	void TeleGrabRight();
 	void TeleGrabLeft();
+	void TeleGrabRight();
+	void PrepTeleGrabLeft();
+	void PrepTeleGrabRight();
+	void UnprepTeleGrabLeft();
+	void UnprepTeleGrabRight();
 
 	// Constants
 	UPROPERTY(EditAnywhere)
@@ -114,4 +115,8 @@ private:
 	// Utility
 	FVector GetKnifeSpawnLocation();
 	FRotator GetKnifeSpawnRotation();
+
+	// State
+	bool bInPrepTeleportLeft = false;
+	bool bInPrepTeleportRight = false;
 };

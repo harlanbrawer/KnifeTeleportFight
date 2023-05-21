@@ -12,6 +12,7 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "CustomUtils.h"
+#include "Components/InputComponent.h"
 
 // Sets default values
 AVRCharacter::AVRCharacter()
@@ -91,8 +92,6 @@ void AVRCharacter::Tick(float DeltaTime)
 	NewCameraOffset.Z = 0;
 	AddActorWorldOffset(NewCameraOffset);
 	VRRoot->AddWorldOffset(-NewCameraOffset);
-
-	UE_LOG(LogTemp, Warning, TEXT("action value: %f"), TeleGrabRightActionValue.GetValue().GetMagnitude());
 }
 
 // Called to bind functionality to input
@@ -111,16 +110,23 @@ void AVRCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Input->BindAction(RecallWeaponAction, ETriggerEvent::Started, this, &AVRCharacter::RecallWeapon);
 	Input->BindAction(TeleportAction, ETriggerEvent::Started, this, &AVRCharacter::Teleport);
 	
-	// Bind to world slowdown and teleport action.
-	Input->BindAction(TeleGrabRightAction, ETriggerEvent::Started, this, &AVRCharacter::TeleGrabRight);
-	Input->BindAction(TeleGrabLeftAction, ETriggerEvent::Started, this, &AVRCharacter::TeleGrabLeft);
-	TeleGrabRightActionValue = Input->BindActionValue(TeleGrabRightAction);
-	TeleGrabLeftActionValue = Input->BindActionValue(TeleGrabLeftAction);
+	// Keep track of when teleport is prepped
+	Input->BindAction(PrepTeleGrabRightAction, ETriggerEvent::Started, this, &AVRCharacter::PrepTeleGrabRight);
+	Input->BindAction(PrepTeleGrabLeftAction, ETriggerEvent::Started, this, &AVRCharacter::PrepTeleGrabLeft);
+	Input->BindAction(PrepTeleGrabRightAction, ETriggerEvent::Completed, this, &AVRCharacter::UnprepTeleGrabRight);
+	Input->BindAction(PrepTeleGrabLeftAction, ETriggerEvent::Completed, this, &AVRCharacter::UnprepTeleGrabLeft);
 }
 
 void AVRCharacter::GrabLeft()
 {
-	LeftHandController->Grab();
+	if (bInPrepTeleportLeft)
+	{
+		TeleGrabLeft();
+	}
+	else
+	{
+		LeftHandController->Grab();
+	}
 }
 
 void AVRCharacter::ReleaseLeft()
@@ -130,7 +136,7 @@ void AVRCharacter::ReleaseLeft()
 
 void AVRCharacter::GrabRight()
 {
-	if (TeleGrabRightActionValue.GetValue().Get<bool>())
+	if (bInPrepTeleportRight)
 	{
 		TeleGrabRight();
 	}
@@ -211,6 +217,28 @@ void AVRCharacter::TeleGrabRight()
 void AVRCharacter::TeleGrabLeft()
 {
 
+}
+
+void AVRCharacter::PrepTeleGrabLeft()
+{
+	bInPrepTeleportLeft = true;
+	bInPrepTeleportRight = false;
+}
+
+void AVRCharacter::PrepTeleGrabRight()
+{
+	bInPrepTeleportLeft = false;
+	bInPrepTeleportRight = true;
+}
+
+void AVRCharacter::UnprepTeleGrabLeft()
+{
+	bInPrepTeleportLeft = false;
+}
+
+void AVRCharacter::UnprepTeleGrabRight()
+{
+	bInPrepTeleportRight = false;
 }
 
 FVector AVRCharacter::GetKnifeSpawnLocation()
