@@ -61,6 +61,23 @@ bool UGrabComponent::TryGrab(UMotionControllerComponent* GrabbingMotionControlle
 	return true;
 }
 
+void UGrabComponent::SocketGrab(USkeletalMeshComponent* Mesh, FName SocketName)
+{
+	if (!Mesh) return;
+	// Get parent primitive component
+	USceneComponent* ParentComponent = GetAttachParent();
+	if (!ParentComponent) return;
+	UPrimitiveComponent* PrimitiveParent = Cast<UPrimitiveComponent>(ParentComponent);
+	if (!PrimitiveParent) return;
+	PrimitiveParent->SetSimulatePhysics(false);
+	GetOwner()->AttachToComponent(Mesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+
+	// Call virtual OnGrabbed method for inherited objects or Dispatch OnGrabbed event for blueprint extensions
+	OnGrabbed();
+
+	bIsHeld = true;
+}
+
 bool UGrabComponent::TryRelease(UMotionControllerComponent* GrabbingMotionControllerComponent)
 {
 	// Get parent primitive component
@@ -72,6 +89,12 @@ bool UGrabComponent::TryRelease(UMotionControllerComponent* GrabbingMotionContro
 	// Start simulating physics to detatch from hand
 	PrimitiveParent->SetSimulatePhysics(true);
 
+	// Point knife in direction of throw
+	if (GrabbingMotionControllerComponent) {
+		GetOwner()->SetActorRotation(GrabbingMotionControllerComponent->ComponentVelocity.Rotation());
+	}
+	GetOwner()->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+
 	// No longer held
 	bIsHeld = false;
 
@@ -79,6 +102,19 @@ bool UGrabComponent::TryRelease(UMotionControllerComponent* GrabbingMotionContro
 	OnDropped();
 
 	return true;
+}
+
+void UGrabComponent::Launch(const FVector& Impulse)
+{
+	// Get parent primitive component
+	USceneComponent* ParentComponent = GetAttachParent();
+	if (!ParentComponent) return;
+	UPrimitiveComponent* PrimitiveParent = Cast<UPrimitiveComponent>(ParentComponent);
+	if (!PrimitiveParent) return;
+
+	TryRelease();
+	GetOwner()->SetActorRotation(Impulse.Rotation());
+	PrimitiveParent->AddImpulse(Impulse);
 }
 
 

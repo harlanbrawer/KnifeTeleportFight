@@ -19,8 +19,10 @@ public:
 	// Sets default values for this component's properties
 	UGrabComponent();
 
-	bool TryGrab(class UMotionControllerComponent* GrabbingMotionControllerComponent);
-	bool TryRelease(class UMotionControllerComponent* GrabbingMotionControllerComponent);
+	bool TryGrab(class UMotionControllerComponent* GrabbingMotionControllerComponent = nullptr);
+	void SocketGrab(USkeletalMeshComponent* Mesh, FName SocketName);
+	bool TryRelease(class UMotionControllerComponent* GrabbingMotionControllerComponent = nullptr);
+	void Launch(const FVector& Impulse);
 
 	bool IsHeld() { return bIsHeld; }
 

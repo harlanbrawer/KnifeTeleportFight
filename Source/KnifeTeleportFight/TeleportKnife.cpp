@@ -18,14 +18,14 @@ ATeleportKnife::ATeleportKnife()
 
 	DamageCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Damage Collider"));
 	SetRootComponent(DamageCollider);
-	DamageCollider->SetSimulatePhysics(true);
+	//DamageCollider->SetSimulatePhysics(true);
 
 	GrabComponent = CreateDefaultSubobject<UGrabComponent>(TEXT("Grab Component"));
 	GrabComponent->SetupAttachment(DamageCollider);
 
 	GrabCollider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Grab Collider"));
 	GrabCollider->SetupAttachment(GrabComponent);
-	GrabCollider->SetSimulatePhysics(false);
+	//GrabCollider->SetSimulatePhysics(false);
 	GrabCollider->SetCollisionObjectType(UGrabComponent::GrabComponentCollisionChannel);
 
 	TrailParticles = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Smoke Trail"));
@@ -37,8 +37,14 @@ void ATeleportKnife::Recall(FVector SpawnLocation, FRotator SpawnRotation)
 	if (GrabComponent->IsHeld()) return;
 
 	DamageCollider->SetSimulatePhysics(false);
+	DamageCollider->SetPhysicsLinearVelocity(FVector::ZeroVector);
 	SetActorRotation(SpawnRotation);
 	SetActorLocation(SpawnLocation);
+}
+
+void ATeleportKnife::Launch(const FVector& Impulse)
+{
+	GetGrabComponent()->Launch(Impulse);
 }
 
 UGrabComponent* ATeleportKnife::GetGrabComponent()

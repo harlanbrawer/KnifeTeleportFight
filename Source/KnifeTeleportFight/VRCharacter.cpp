@@ -30,6 +30,14 @@ AVRCharacter::AVRCharacter()
 	PostProcessComponent->SetupAttachment(GetRootComponent());
 }
 
+void AVRCharacter::HandleDeath()
+{
+	Super::HandleDeath();
+	SetActorHiddenInGame(true);
+	SetActorTickEnabled(false);
+	//bAlive = false;
+}
+
 // Called when the game starts or when spawned
 void AVRCharacter::BeginPlay()
 {
@@ -185,7 +193,7 @@ void AVRCharacter::TeleGrabRight()
 	FVector CameraToHand = RightHandController->GetActorLocation() - Camera->GetComponentLocation();
 	FVector CameraTeleportLocation = KnifeLocation - CameraToHand;
 	
-	FVector ActorToCamera = Camera->GetComponentLocation() - GetActorLocation();
+	FVector ActorToCamera = Camera->GetComponentLocation() - GetActorLocation(); 
 	FVector ActorToHand = RightHandController->GetActorLocation() - GetActorLocation();
 
 	// if Camera teleport location is too low such that the character is in the ground, then move the character and knife up

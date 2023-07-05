@@ -43,6 +43,7 @@ void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDa
 	Health -= Damage;
 	UE_LOG(LogTemp, Display, TEXT("Take health damage %f"), Health);
 	if (Health <= 0.f && TeleportKnifeFightGameMode) {
+		UE_LOG(LogTemp, Warning, TEXT("Calling actor died on game mode %s"), *DamagedActor->GetName());
 		TeleportKnifeFightGameMode->ActorDied(DamagedActor);
 	}
 }

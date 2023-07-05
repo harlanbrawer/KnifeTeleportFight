@@ -6,19 +6,22 @@
 #include "HandControllerBase.h"
 #include "TeleportKnife.h"
 #include "EnhancedInputComponent.h"
+#include "BaseCharacter.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "VRCharacter.generated.h"
 
 UCLASS()
-class KNIFETELEPORTFIGHT_API AVRCharacter : public ACharacter
+class KNIFETELEPORTFIGHT_API AVRCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
 	AVRCharacter();
+
+	virtual void HandleDeath() override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -90,6 +93,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* PrepTeleGrabLeftAction;
 
+	// Actions
 	void GrabLeft();
 	void ReleaseLeft();
 	void GrabRight();

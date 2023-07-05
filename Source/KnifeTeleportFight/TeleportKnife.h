@@ -16,6 +16,7 @@ public:
 	ATeleportKnife();
 
 	void Recall(FVector SpawnLocation, FRotator SpawnRotation);
+	void Launch(const FVector& Impulse);
 	class UGrabComponent* GetGrabComponent();
 
 protected:
@@ -57,7 +58,7 @@ private:
 
 	// Constants
 	UPROPERTY(EditAnywhere)
-	float Damage = 100.f;
+	float Damage = 50.f;
 
 	// State
 	FVector ThrowDirection;
