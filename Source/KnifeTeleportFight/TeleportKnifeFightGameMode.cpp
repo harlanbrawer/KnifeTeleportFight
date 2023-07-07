@@ -4,6 +4,10 @@
 #include "TeleportKnifeFightGameMode.h"
 
 #include "EnemyCharacter.h"
+#include "EngineUtils.h"
+#include "GameFramework/Controller.h"
+#include "VRCharacter.h"
+#include "Kismet/GameplayStatics.h"
 
 void ATeleportKnifeFightGameMode::ActorDied(AActor* DeadActor) {
 	//if (DeadActor == Tank) {
@@ -22,8 +26,13 @@ void ATeleportKnifeFightGameMode::ActorDied(AActor* DeadActor) {
 	//}
 	//FTimerDelegate TimerDel = FTimerDelegate::CreateUObject(this, &AToonTanksGameMode::BeginPlay);\
 	
-	if (AEnemyCharacter* DeadCharacter = Cast<AEnemyCharacter>(DeadActor)) {
-		DeadCharacter->HandleDeath();
+	if (AEnemyCharacter* DeadEnemyCharacter = Cast<AEnemyCharacter>(DeadActor)) {
+		DeadEnemyCharacter->HandleDeath();
+		EndGame(true);
+	}
+	else if (AVRCharacter* DeadMainCharacter = Cast<AVRCharacter>(DeadActor)) {
+		DeadMainCharacter->HandleDeath();
+		EndGame(false);
 	}
 }
 
@@ -31,10 +40,23 @@ void ATeleportKnifeFightGameMode::ActorDied(AActor* DeadActor) {
 void ATeleportKnifeFightGameMode::BeginPlay() {
 	Super::BeginPlay();
 
+	Player1 = Cast<AVRCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
+	Player2 = Cast<AEnemyCharacter>(UGameplayStatics::GetPlayerPawn(this, 1));
+
 	HandleGameStart();
 }
 
 void ATeleportKnifeFightGameMode::HandleGameStart() {
-	StartGame();
 
+
+	StartGame();
+}
+
+void ATeleportKnifeFightGameMode::EndGame(bool bIsPlayerWinner)
+{
+	for (AController* Controller : TActorRange<AController>(GetWorld()))
+	{
+		bool bIsWinner = Controller->IsPlayerController() == bIsPlayerWinner;
+		Controller->GameHasEnded(Controller->GetPawn(), bIsWinner);
+	}
 }

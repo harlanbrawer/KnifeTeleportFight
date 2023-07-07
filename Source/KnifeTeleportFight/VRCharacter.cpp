@@ -33,8 +33,8 @@ AVRCharacter::AVRCharacter()
 void AVRCharacter::HandleDeath()
 {
 	Super::HandleDeath();
-	SetActorHiddenInGame(true);
-	SetActorTickEnabled(false);
+	//SetActorHiddenInGame(true);
+	//SetActorTickEnabled(false);
 	//bAlive = false;
 }
 

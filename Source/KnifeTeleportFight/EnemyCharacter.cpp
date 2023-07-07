@@ -20,6 +20,7 @@ AEnemyCharacter::AEnemyCharacter()
 
 void AEnemyCharacter::HandleDeath()
 {
+	Super::HandleDeath();
 	Destroy();
 }
 

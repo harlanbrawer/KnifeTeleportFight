@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TeleportKnife.generated.h"
+#include "TeleportKnifeProjectileMovement.generated.h"
 
 UCLASS()
-class KNIFETELEPORTFIGHT_API ATeleportKnife : public AActor
+class KNIFETELEPORTFIGHT_API ATeleportKnifeProjectileMovement : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
-	ATeleportKnife();
+	ATeleportKnifeProjectileMovement();
 
 	void Recall(FVector SpawnLocation, FRotator SpawnRotation);
 	void Launch(const FVector& Impulse);
@@ -49,6 +49,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	class USoundBase* HitSound;
+
+	UPROPERTY(VisibleAnywhere)
+	class UProjectileMovementComponent* ProjectileMovementComponent;
 
 	// Config
 

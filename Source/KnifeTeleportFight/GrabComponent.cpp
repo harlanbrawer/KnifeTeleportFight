@@ -7,6 +7,7 @@
 #include "MotionControllerComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/ArrowComponent.h"
+#include "Math/Vector.h"
 
 // Sets default values for this component's properties
 UGrabComponent::UGrabComponent()
@@ -91,12 +92,14 @@ bool UGrabComponent::TryRelease(UMotionControllerComponent* GrabbingMotionContro
 
 	// Point knife in direction of throw
 	if (GrabbingMotionControllerComponent) {
-		GetOwner()->SetActorRotation(GrabbingMotionControllerComponent->ComponentVelocity.Rotation());
+		//GetOwner()->SetActorRotation(GrabbingMotionControllerComponent->ComponentVelocity.Rotation());
 	}
-	GetOwner()->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+	GetOwner()->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
 	// No longer held
 	bIsHeld = false;
+
+	//PrimitiveParent->AddImpulse(5 * PrimitiveParent->GetComponentVelocity().GetSafeNormal());
 
 	// Call virtual OnDropped
 	OnDropped();

@@ -28,4 +28,7 @@ protected:
 
 private:
 	void HandleGameStart();
+	void EndGame(bool bIsPlayerWinner);
+	class AVRCharacter* Player1;
+	class AEnemyCharacter* Player2;
 };
