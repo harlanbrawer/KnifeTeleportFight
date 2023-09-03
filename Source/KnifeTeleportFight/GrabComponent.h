@@ -44,6 +44,8 @@ private:
 	// State
 	bool bIsHeld = false;
 	class UMotionControllerComponent* HoldingControllerComponentRef = nullptr;
+	FVector PrevFrameOwnerLocation;
+	FVector ManualOwnerVelocity;
 
 	// Utility
 	virtual void OnGrabbed() {}

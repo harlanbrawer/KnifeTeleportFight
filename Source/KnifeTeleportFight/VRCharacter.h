@@ -52,8 +52,8 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AHandControllerBase> RightHandControllerClass;
 
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<ATeleportKnife> TeleportKnifeClass;
+	//UPROPERTY(EditDefaultsOnly)
+	//TSubclassOf<ATeleportKnife> TeleportKnifeClass;
 
 	// References
 	UPROPERTY()
@@ -62,8 +62,8 @@ private:
 	UPROPERTY()
 	AHandControllerBase* RightHandController;
 
-	UPROPERTY()
-	ATeleportKnife* TeleportKnife;
+	UPROPERTY(EditAnywhere)
+	class ATeleportKnife* TeleportKnife;
 
 	// Input
 	UPROPERTY(EditAnywhere, Category = "Input")

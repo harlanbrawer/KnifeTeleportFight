@@ -20,6 +20,8 @@ public:
 	AHandControllerBase();
 
 	void SetHand(EControllerHand Hand);
+
+	UFUNCTION(BlueprintCallable)
 	void PairController(AHandControllerBase* Controller);
 
 	void Grab();

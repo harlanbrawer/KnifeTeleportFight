@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/ArrowComponent.h"
 #include "Math/Vector.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values for this component's properties
 UGrabComponent::UGrabComponent()
@@ -87,19 +88,22 @@ bool UGrabComponent::TryRelease(UMotionControllerComponent* GrabbingMotionContro
 	UPrimitiveComponent* PrimitiveParent = Cast<UPrimitiveComponent>(ParentComponent);
 	if (!PrimitiveParent) return false;
 
+	GetOwner()->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
 	// Start simulating physics to detatch from hand
 	PrimitiveParent->SetSimulatePhysics(true);
 
-	// Point knife in direction of throw
-	if (GrabbingMotionControllerComponent) {
-		//GetOwner()->SetActorRotation(GrabbingMotionControllerComponent->ComponentVelocity.Rotation());
-	}
-	GetOwner()->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	// Freeze the knife
+	PrimitiveParent->PutRigidBodyToSleep();
+	PrimitiveParent->WakeRigidBody();
+
+	// convert current manual owner velocity to actual velocity by adding impulse
+	PrimitiveParent->AddImpulse(ManualOwnerVelocity, "", true);
+
+	HoldingControllerComponentRef = nullptr;
 
 	// No longer held
 	bIsHeld = false;
-
-	//PrimitiveParent->AddImpulse(5 * PrimitiveParent->GetComponentVelocity().GetSafeNormal());
 
 	// Call virtual OnDropped
 	OnDropped();
@@ -117,7 +121,7 @@ void UGrabComponent::Launch(const FVector& Impulse)
 
 	TryRelease();
 	GetOwner()->SetActorRotation(Impulse.Rotation());
-	PrimitiveParent->AddImpulse(Impulse);
+	PrimitiveParent->AddImpulse(Impulse, "", true);
 }
 
 
@@ -136,6 +140,7 @@ void UGrabComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	ManualOwnerVelocity = (GetOwner()->GetActorLocation() - PrevFrameOwnerLocation) / DeltaTime;
+	PrevFrameOwnerLocation = GetOwner()->GetActorLocation();
 }
 

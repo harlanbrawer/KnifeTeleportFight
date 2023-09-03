@@ -15,26 +15,29 @@ ATeleportKnife::ATeleportKnife()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh"));
+	SetRootComponent(StaticMeshComponent);
+
 	DamageCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Damage Collider"));
-	SetRootComponent(DamageCollider);
+	DamageCollider->SetupAttachment(StaticMeshComponent);
 
 	GrabComponent = CreateDefaultSubobject<UGrabComponent>(TEXT("Grab Component"));
-	GrabComponent->SetupAttachment(DamageCollider);
+	GrabComponent->SetupAttachment(StaticMeshComponent);
 
 	GrabCollider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Grab Collider"));
 	GrabCollider->SetupAttachment(GrabComponent);
 	GrabCollider->SetCollisionObjectType(UGrabComponent::GrabComponentCollisionChannel);
 
 	TrailParticles = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Smoke Trail"));
-	TrailParticles->SetupAttachment(DamageCollider);
+	TrailParticles->SetupAttachment(StaticMeshComponent);
 }
 
 void ATeleportKnife::Recall(FVector SpawnLocation, FRotator SpawnRotation)
 {
 	if (GrabComponent->IsHeld()) return;
 
-	DamageCollider->SetSimulatePhysics(false);
-	DamageCollider->SetPhysicsLinearVelocity(FVector::ZeroVector);
+	StaticMeshComponent->SetSimulatePhysics(false);
+	StaticMeshComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
 	SetActorRotation(SpawnRotation);
 	SetActorLocation(SpawnLocation);
 }
@@ -54,7 +57,8 @@ void ATeleportKnife::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	DamageCollider->OnComponentHit.AddDynamic(this, &ATeleportKnife::OnHit);
+	//DamageCollider->OnComponentHit.AddDynamic(this, &ATeleportKnife::OnHit);
+	StaticMeshComponent->OnComponentHit.AddDynamic(this, &ATeleportKnife::OnHit);
 }
 
 // Called every frame
@@ -62,21 +66,24 @@ void ATeleportKnife::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Always try to point the knife in the direction it is moving
-	if (!GrabComponent->IsHeld())
+	// Point knife in direction of movement if going fast enough
+	if (!GrabComponent->IsHeld() && StaticMeshComponent->GetComponentVelocity().Length() > MINIMUM_VELOCITY_FOR_AUTO_TURNING)
 	{
 		SetActorRotation(FMath::RInterpTo(
-			GetActorForwardVector().Rotation(),
-			GetVelocity().Rotation(),
-			GetWorld()->GetDeltaSeconds(),
+			GetActorRotation(),
+			StaticMeshComponent->GetComponentVelocity().Rotation(),
+			DeltaTime,
 			RotationInterpSpeed * GetVelocity().Length()
 		));
+		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + StaticMeshComponent->GetComponentVelocity().GetSafeNormal() * 100, 50, FColor::Red, true);
 	}
 }
 
 void ATeleportKnife::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpluse, const FHitResult& HitResult)
 {
+	UE_LOG(LogTemp, Warning, TEXT("HIT!"));
 	AActor* MyOwner = GetOwner();
+	if (!MyOwner) return;
 	AController* MyOwnerInstigator = MyOwner->GetInstigatorController();
 	UClass* DamageTypeClass = UDamageType::StaticClass();
 

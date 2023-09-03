@@ -27,6 +27,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	class UStaticMeshComponent* StaticMeshComponent;
+
 private:
 	// Components
 	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
@@ -63,6 +66,5 @@ private:
 	UPROPERTY(EditAnywhere)
 	float RotationInterpSpeed = 0.1f;
 
-	// State
-	FVector ThrowDirection;
+	float MINIMUM_VELOCITY_FOR_AUTO_TURNING = 10.0f;
 };

@@ -13,6 +13,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "CustomUtils.h"
 #include "Components/InputComponent.h"
+#include "TeleportKnife.h"
 
 // Sets default values
 AVRCharacter::AVRCharacter()
@@ -43,7 +44,7 @@ void AVRCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Stage);
+	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Eye);
 
 	if (RightHandControllerClass)
 	{
@@ -68,9 +69,9 @@ void AVRCharacter::BeginPlay()
 	}
 
 	// Spawn the knife in front of you
-	if (TeleportKnifeClass)
+	if (TeleportKnife)
 	{
-		TeleportKnife = GetWorld()->SpawnActor<ATeleportKnife>(TeleportKnifeClass);
+		//TeleportKnife = GetWorld()->SpawnActor<ATeleportKnife>(TeleportKnifeClass);
 		TeleportKnife->SetOwner(this);
 		RecallWeapon();
 	}
