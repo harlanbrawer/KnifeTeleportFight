@@ -33,6 +33,7 @@ ATeleportKnifeProjectileMovement::ATeleportKnifeProjectileMovement()
 	TrailParticles->SetupAttachment(StaticMeshComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
+	ProjectileMovementComponent->UpdatedComponent = StaticMeshComponent;
 }
 
 void ATeleportKnifeProjectileMovement::Recall(FVector SpawnLocation, FRotator SpawnRotation)
@@ -68,6 +69,27 @@ void ATeleportKnifeProjectileMovement::BeginPlay()
 void ATeleportKnifeProjectileMovement::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (ProjectileMovementComponent->UpdatedComponent) {
+		if (ProjectileMovementComponent->UpdatedComponent->Mobility) {
+			//UE_LOG(LogTemp, Warning, TEXT("log 1: %s"), ProjectileMovementComponent->UpdatedComponent->Mobility != EComponentMobility::Movable ? TEXT("true") : TEXT("false"));
+		}
+	}
+	if (ProjectileMovementComponent->UpdatedComponent) {
+		//UE_LOG(LogTemp, Warning, TEXT("log 2: %s"), *ProjectileMovementComponent->UpdatedComponent->GetName());
+		//UE_LOG(LogTemp, Warning, TEXT("log 3: %d"), ProjectileMovementComponent->UpdatedComponent->Mobility);
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("should skip update: %s"), ProjectileMovementComponent->ShouldSkipUpdate(DeltaTime) ? TEXT("true") : TEXT("false"));
+
+	UE_LOG(LogTemp, Warning, TEXT("has stopped simulation: %s"), ProjectileMovementComponent->HasStoppedSimulation() ? TEXT("true") : TEXT("false"));
+
+	UE_LOG(LogTemp, Warning, TEXT("is simulation enabled: %s"), ProjectileMovementComponent->bSimulationEnabled ? TEXT("true") : TEXT("false"));
+
+	UE_LOG(LogTemp, Warning, TEXT("is updated component valid: %s"), IsValid(ProjectileMovementComponent->UpdatedComponent) ? TEXT("true") : TEXT("false"));
+	
+	UE_LOG(LogTemp, Warning, TEXT("max sim iter: %d"), ProjectileMovementComponent->MaxSimulationIterations);
+
+	UE_LOG(LogTemp, Warning, TEXT("only update if rendered: %s"), ProjectileMovementComponent->bUpdateOnlyIfRendered ? TEXT("true") : TEXT("false"));
 
 	// Tack velocity while held since physics is not simulated
 	if (!GrabComponent->IsHeld())
@@ -104,3 +126,4 @@ void ATeleportKnifeProjectileMovement::OnHit(UPrimitiveComponent* HitComp, AActo
 		//}
 	}
 }
+

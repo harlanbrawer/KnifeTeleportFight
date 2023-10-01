@@ -8,7 +8,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/ArrowComponent.h"
 #include "Math/Vector.h"
-#include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values for this component's properties
 UGrabComponent::UGrabComponent()
@@ -94,11 +93,19 @@ bool UGrabComponent::TryRelease(UMotionControllerComponent* GrabbingMotionContro
 	PrimitiveParent->SetSimulatePhysics(true);
 
 	// Freeze the knife
-	PrimitiveParent->PutRigidBodyToSleep();
-	PrimitiveParent->WakeRigidBody();
+	//PrimitiveParent->PutRigidBodyToSleep();
+	//PrimitiveParent->WakeRigidBody();
 
 	// convert current manual owner velocity to actual velocity by adding impulse
-	PrimitiveParent->AddImpulse(ManualOwnerVelocity, "", true);
+	//PrimitiveParent->AddImpulse(ManualOwnerVelocity, "", true);
+
+	//UProjectileMovementComponent* ProjectileMovementComponent = GetOwner()->GetComponentByClass<UProjectileMovementComponent>();
+	//if (ProjectileMovementComponent) {
+	//	ProjectileMovementComponent->Velocity = ManualOwnerVelocity;
+	//	ProjectileMovementComponent->UpdatedComponent = GetOwner()->GetRootComponent();
+	//}
+
+	//ProjectileMovementComponent->Activate();
 
 	HoldingControllerComponentRef = nullptr;
 

@@ -81,7 +81,7 @@ UGrabComponent* AHandControllerBase::GetGrabComponentNearMotionController()
 	FVector HandLocation = GetActorLocation();
 	
 	TArray<FHitResult> OutHits;
-	bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), HandLocation, HandLocation, GrabRadius, GrabbableObjectTypes, false, {}, EDrawDebugTrace::Persistent, OutHits, true);
+	bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), HandLocation, HandLocation, GrabRadius, GrabbableObjectTypes, false, {}, EDrawDebugTrace::None, OutHits, true);
 	if (!bHit) return nullptr;
 	if (!OutHits.Num()) return nullptr; // Not sure if this is necessary since bHit should be false I think
 

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "GameFramework/ProjectileMovementComponent.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TeleportKnifeProjectileMovement.generated.h"
@@ -26,6 +28,9 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction", BlueprintReadWrite)
+		class UProjectileMovementComponent* ProjectileMovementComponent;
 
 private:
 	// Components
@@ -52,9 +57,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 		class USoundBase* HitSound;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
-		class UProjectileMovementComponent* ProjectileMovementComponent;
 
 	// Config
 

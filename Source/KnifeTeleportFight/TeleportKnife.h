@@ -64,7 +64,7 @@ private:
 	float Damage = 50.f;
 
 	UPROPERTY(EditAnywhere)
-	float RotationInterpSpeed = 0.1f;
+	float RotationInterpSpeed = 0.07f;
 
-	float MINIMUM_VELOCITY_FOR_AUTO_TURNING = 10.0f;
+	float MINIMUM_VELOCITY_FOR_AUTO_TURNING = 0.1f;
 };

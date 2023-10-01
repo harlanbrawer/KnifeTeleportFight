@@ -8,6 +8,7 @@
 #include "Components/BoxComponent.h"
 #include "GrabComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ATeleportKnife::ATeleportKnife()
@@ -67,15 +68,12 @@ void ATeleportKnife::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// Point knife in direction of movement if going fast enough
-	if (!GrabComponent->IsHeld() && StaticMeshComponent->GetComponentVelocity().Length() > MINIMUM_VELOCITY_FOR_AUTO_TURNING)
+	if (!GrabComponent->IsHeld() && StaticMeshComponent->IsSimulatingPhysics() /* && StaticMeshComponent->GetComponentVelocity().Length() > MINIMUM_VELOCITY_FOR_AUTO_TURNING */)
 	{
-		SetActorRotation(FMath::RInterpTo(
-			GetActorRotation(),
-			StaticMeshComponent->GetComponentVelocity().Rotation(),
-			DeltaTime,
-			RotationInterpSpeed * GetVelocity().Length()
-		));
-		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + StaticMeshComponent->GetComponentVelocity().GetSafeNormal() * 100, 50, FColor::Red, true);
+		float AngleBetween = FMath::Acos(FVector::DotProduct(GetActorForwardVector(), StaticMeshComponent->GetComponentVelocity().GetSafeNormal()));
+		FVector AxisToRotateOnToBeStraight = FVector::CrossProduct(GetActorForwardVector(), StaticMeshComponent->GetComponentVelocity()).GetSafeNormal();
+		StaticMeshComponent->AddAngularImpulseInRadians(AxisToRotateOnToBeStraight * AngleBetween * StaticMeshComponent->GetComponentVelocity().Length() * 0.01, NAME_None, true);
+		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + StaticMeshComponent->GetComponentVelocity().GetSafeNormal() * 100, 10, FColor::Red, false, 5, 0, .1);
 	}
 }
 
