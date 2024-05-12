@@ -15,7 +15,7 @@ AHandControllerBase::AHandControllerBase()
 
 	MotionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController"));
 	SetRootComponent(MotionController);
-	MotionController->SetShowDeviceModel(true);
+	//MotionController->SetShowDeviceModel(true);
 
 	HeldUpDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("HeldUpDirection"));
 	HeldUpDirection->SetupAttachment(MotionController);
@@ -90,7 +90,8 @@ UGrabComponent* AHandControllerBase::GetGrabComponentNearMotionController()
 	for (int i = 0; i < OutHits.Num(); i++)
 	{
 		AActor* HitActor = OutHits[i].GetActor();
-		TArray<UActorComponent*> GrabComponentsOnActor = HitActor->GetComponentsByClass(UGrabComponent::StaticClass());
+		TArray<UActorComponent*> GrabComponentsOnActor;
+		HitActor->GetComponents(UGrabComponent::StaticClass(), GrabComponentsOnActor);
 		for (int j = 0; j < GrabComponentsOnActor.Num(); j++)
 		{
 			UGrabComponent* HitComponent = Cast<UGrabComponent>(GrabComponentsOnActor[j]);

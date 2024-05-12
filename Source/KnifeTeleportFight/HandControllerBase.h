@@ -54,6 +54,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	float GrabRadius = 10;
 
+	UPROPERTY(EditAnywhere)
+	bool bControllerVisible = true;
+
 	TArray<TEnumAsByte<EObjectTypeQuery>> GrabbableObjectTypes = { UEngineTypes::ConvertToObjectType(UGrabComponent::GrabComponentCollisionChannel) };
 
 	// State

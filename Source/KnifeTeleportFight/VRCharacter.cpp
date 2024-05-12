@@ -9,7 +9,6 @@
 #include "Camera/CameraComponent.h"
 #include "Components/PostProcessComponent.h"
 #include "InputMappingContext.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "CustomUtils.h"
 #include "Components/InputComponent.h"
@@ -39,12 +38,33 @@ void AVRCharacter::HandleDeath()
 	//bAlive = false;
 }
 
+FTransform AVRCharacter::GetCameraTransform()
+{
+	if (!Camera) return FTransform::Identity;
+	return Camera->GetComponentToWorld();
+}
+
+FTransform AVRCharacter::GetLeftControllerTransform()
+{
+	if (!LeftHandController) return FTransform::Identity;
+	return LeftHandController->GetActorTransform();
+}
+
+FTransform AVRCharacter::GetRightControllerTransform()
+{
+	if (!RightHandController) return FTransform::Identity;
+	return RightHandController->GetActorTransform();
+}
+
+UCameraComponent* AVRCharacter::GetCamera()
+{
+	return Camera;
+}
+
 // Called when the game starts or when spawned
 void AVRCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Eye);
 
 	if (RightHandControllerClass)
 	{
@@ -97,10 +117,10 @@ void AVRCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FVector NewCameraOffset = Camera->GetComponentLocation() - GetActorLocation();
-	NewCameraOffset.Z = 0;
-	AddActorWorldOffset(NewCameraOffset);
-	VRRoot->AddWorldOffset(-NewCameraOffset);
+	//FVector NewCameraOffset = Camera->GetComponentLocation() - GetActorLocation();
+	//NewCameraOffset.Z = 0;
+	//AddActorWorldOffset(NewCameraOffset);
+	//VRRoot->AddWorldOffset(-NewCameraOffset);
 }
 
 // Called to bind functionality to input

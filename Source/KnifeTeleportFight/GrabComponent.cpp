@@ -97,7 +97,7 @@ bool UGrabComponent::TryRelease(UMotionControllerComponent* GrabbingMotionContro
 	//PrimitiveParent->WakeRigidBody();
 
 	// convert current manual owner velocity to actual velocity by adding impulse
-	//PrimitiveParent->AddImpulse(ManualOwnerVelocity, "", true);
+	PrimitiveParent->AddImpulse(ManualOwnerVelocity * 0.5, "", true);
 
 	//UProjectileMovementComponent* ProjectileMovementComponent = GetOwner()->GetComponentByClass<UProjectileMovementComponent>();
 	//if (ProjectileMovementComponent) {

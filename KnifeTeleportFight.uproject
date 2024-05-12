@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.2",
+	"EngineAssociation": "5.4",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -26,7 +26,7 @@
 				"Win64",
 				"Linux",
 				"Android",
-				"HoloLens"
+				"VisionOS"
 			]
 		},
 		{

@@ -73,7 +73,7 @@ void ATeleportKnife::Tick(float DeltaTime)
 		float AngleBetween = FMath::Acos(FVector::DotProduct(GetActorForwardVector(), StaticMeshComponent->GetComponentVelocity().GetSafeNormal()));
 		FVector AxisToRotateOnToBeStraight = FVector::CrossProduct(GetActorForwardVector(), StaticMeshComponent->GetComponentVelocity()).GetSafeNormal();
 		StaticMeshComponent->AddAngularImpulseInRadians(AxisToRotateOnToBeStraight * AngleBetween * StaticMeshComponent->GetComponentVelocity().Length() * 0.01, NAME_None, true);
-		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + StaticMeshComponent->GetComponentVelocity().GetSafeNormal() * 100, 10, FColor::Red, false, 5, 0, .1);
+		//DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + StaticMeshComponent->GetComponentVelocity().GetSafeNormal() * 100, 10, FColor::Red, false, 5, 0, .1);
 	}
 }
 

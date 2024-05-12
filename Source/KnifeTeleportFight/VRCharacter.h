@@ -23,6 +23,16 @@ public:
 
 	virtual void HandleDeath() override;
 
+	// For IK animation blueprint
+	UFUNCTION(BlueprintCallable)
+	FTransform GetCameraTransform();
+	UFUNCTION(BlueprintCallable)
+	FTransform GetLeftControllerTransform();
+	UFUNCTION(BlueprintCallable)
+	FTransform GetRightControllerTransform();
+	UFUNCTION(BlueprintCallable)
+	UCameraComponent* GetCamera();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
